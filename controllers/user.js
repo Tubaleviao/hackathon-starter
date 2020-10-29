@@ -106,12 +106,8 @@ exports.postSignup = (req, res, next) => {
     }
     user.save((err) => {
       if (err) { return next(err); }
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        res.redirect('/');
-      });
+      req.flash('success', {msg: 'An email with the authentication link was sent.'})
+
     });
   });
 };
@@ -384,6 +380,40 @@ exports.getVerifyEmail = (req, res, next) => {
     .then(sendVerifyEmail)
     .then(() => res.redirect('/account'))
     .catch(next);
+};
+
+/**
+ * POST /lomagic
+ * Send login email
+ */
+
+exports.postLoginMagic = (req, res, next) => {
+  const validationErrors = [];
+  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' });
+
+  req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
+
+  req.flash('errors', {msg: 'Not implemented yet'});
+  return res.redirect('/login');
+};
+
+/**
+ * POST /magic
+ * Send signup email
+ */
+
+exports.postSignupMagic = (req, res, next) => {
+  const validationErrors = [];
+  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' });
+
+  if (validationErrors.length) {
+    req.flash('errors', validationErrors);
+    return res.redirect('/signup');
+  }
+  req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
+
+  req.flash('errors', {msg: 'Not implemented yet'});
+  return res.redirect('/signup');
 };
 
 /**
